@@ -53,7 +53,50 @@ class Segment:
         return False
 
 
+class Line:
+    """
+    Line for ax+by=c
+    """
+
+    def __init__(self, segment: Segment):
+        """
+        Init from a segment
+        """
+        x1, y1 = segment.start
+        x2, y2 = segment.end
+        self.a = y2 - y1
+        self.b = x1 - x2
+        self.c = x1 * y2 - x2 * y1
+
+    def intersection_point(self, other: 'Line'):
+        """
+        get (x, y) of intersection point of two lines
+        return (None, None) if not intersected
+        """
+        determinant = self.a * other.b - other.a * self.b
+        if float_equals(determinant, 0):
+            return None, None  # Lines are parallel, no intersection
+        x = (other.b * self.c - self.b * other.c) / determinant
+        y = (self.a * other.c - other.a * self.c) / determinant
+        return x, y
+
+
 def get_centralsymmetry_point(p, center):
     x, y = p
     cx, cy = center
     return 2 * cx - x, 2 * cy - y
+
+
+def get_axialsymmetry_point(p, axis: Line):
+    x1, y1 = p
+    a, b, c = axis.a, axis.b, axis.c
+    return ((b*b-a*a)*x1-2*a*b*y1+2*a*c)/(a*a+b*b), ((a*a-b*b)*y1-2*a*b*x1+2*b*c)/(a*a+b*b)
+
+
+def get_axialsymmetry_angle(p_angle, axis_angle):
+    angle = 2 * axis_angle - p_angle
+    if angle < 0:
+        angle += 360
+    elif angle >= 360:
+        angle -= 360
+    return angle

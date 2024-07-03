@@ -1,7 +1,9 @@
 import math
 import turtle
 
-from .geotool import Segment, float_tuple_equals, get_centralsymmetry_point
+from .geotool import (Line, Segment, float_tuple_equals,
+                      get_axialsymmetry_angle, get_axialsymmetry_point,
+                      get_centralsymmetry_point)
 
 
 class Turtle(turtle.Turtle):
@@ -68,20 +70,49 @@ class Turtle(turtle.Turtle):
         else:
             self.setheading(v.heading())
 
-    def axial_symmetry(self, axis, line=False):
-        pass
+    def axial_symmetry(self, axis, color=None, line=False):
+        axis_start = axis.position()
+        # axis.forward(100 / self._scale())
+        axis.forward(100 / self._scale())
+        axis_end = axis.position()
+        # axis.undo()
+        axis_line = Line(Segment(*axis_start, *axis_end))
+        if not line:
+            x, y = get_axialsymmetry_point(self.position(), axis_line)
+            t = self[-1]
+            if color is not None:
+                t.color(color)
+            t.teleport(x, y)
+            t.setheading(get_axialsymmetry_angle(
+                self.heading(), axis.heading()))
+            return t
+        else:
+            points = self.currentLine
+            t = self[0]
+            if color is not None:
+                t.color(color)
+            t.setheading(get_axialsymmetry_angle(
+                self.heading(), axis.heading()))
+            t.teleport(get_axialsymmetry_point(points[0], axis_line))
+            for point in points[1:]:
+                t.go_towards(get_axialsymmetry_point(point, axis_line))
+            return t
 
-    def central_symmetry(self, center, line=False):
+    def central_symmetry(self, center, color=None, line=False):
         if not line:
             x, y = get_centralsymmetry_point(
                 self.position(), center.position())
             t = self[-1]
+            if color is not None:
+                t.color(color)
             t.teleport(x, y)
             t.left(180)
             return t
         else:
             points = self.currentLine
             t = self[0]
+            if color is not None:
+                t.color(color)
             t.left(180)
             t.teleport(get_centralsymmetry_point(points[0], center.position()))
             for point in points[1:]:
@@ -89,7 +120,7 @@ class Turtle(turtle.Turtle):
                     point, center.position()))
             return t
 
-    def axis(self, v):
+    def axis(self, v, color=None, line=False):
         pass
 
     def smart_forward(self):
@@ -102,7 +133,7 @@ class Turtle(turtle.Turtle):
         r.color('#CCCCCC')
         r.speed(0)
         # lb, ub = 0, 10000.0  # lower bound and upper bound
-        lb, ub = 0, 500 / self.getscreen().xscale  # lower bound and upper bound
+        lb, ub = 0, 500 / self._scale()  # lower bound and upper bound
         while ub - lb > 0.01:
             mid = (lb + ub) / 2
             # print(f'lb={lb}, ub={ub}, mid={mid}')
@@ -164,6 +195,9 @@ class Turtle(turtle.Turtle):
             Segment(-screen_width / 2, screen_height / 2, -
                     screen_width / 2, -screen_height / 2)
         ]
+
+    def _scale(self):
+        return self.getscreen().xscale
 
 
 Pen = Turtle
