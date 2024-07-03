@@ -1,14 +1,13 @@
 import math
 import turtle
 
-from .geotool import Segment, float_tuple_equals
+from .geotool import Segment, float_tuple_equals, get_centralsymmetry_point
 
 
 class Turtle(turtle.Turtle):
     def __getitem__(self, index):
         t = Turtle()
         if isinstance(index, slice):
-            # return (index.start, index.stop, index.step)
             points = self.currentLine[index]
             self.teleport(points[0])
             for point in points[1:]:
@@ -44,13 +43,21 @@ class Turtle(turtle.Turtle):
         self.clear()
         self.speed(speed)
 
+    def into_shell(self):
+        self.dot(5)
+        self.hideturtle()
+
     def go_towards(self, target, percent=100):
-        self.setheading(self.towards(target.position()))
+        if isinstance(target, tuple):
+            target_pos = target
+        else:
+            target_pos = target.position()
+        self.setheading(self.towards(target_pos))
         if percent == 100:
-            self.goto(target.position())
+            self.goto(target_pos)
         else:
             x1, y1 = self.position()
-            x2, y2 = target.position()
+            x2, y2 = target_pos
             x, y = x1 + (x2 - x1) * percent / 100, y1 + \
                 (y2 - y1) * percent / 100
             self.goto(x, y)
@@ -65,7 +72,22 @@ class Turtle(turtle.Turtle):
         pass
 
     def central_symmetry(self, center, line=False):
-        pass
+        if not line:
+            x, y = get_centralsymmetry_point(
+                self.position(), center.position())
+            t = self[-1]
+            t.teleport(x, y)
+            t.left(180)
+            return t
+        else:
+            points = self.currentLine
+            t = self[0]
+            t.left(180)
+            t.teleport(get_centralsymmetry_point(points[0], center.position()))
+            for point in points[1:]:
+                t.go_towards(get_centralsymmetry_point(
+                    point, center.position()))
+            return t
 
     def axis(self, v):
         pass
@@ -80,7 +102,7 @@ class Turtle(turtle.Turtle):
         r.color('#CCCCCC')
         r.speed(0)
         # lb, ub = 0, 10000.0  # lower bound and upper bound
-        lb, ub = 0, 50.0  # lower bound and upper bound
+        lb, ub = 0, 500 / self.getscreen().xscale  # lower bound and upper bound
         while ub - lb > 0.01:
             mid = (lb + ub) / 2
             # print(f'lb={lb}, ub={ub}, mid={mid}')

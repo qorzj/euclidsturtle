@@ -51,3 +51,9 @@ class Segment:
                 if x is not None and (ignore_point is None or not float_tuple_equals((x, y), ignore_point)):
                     return True
         return False
+
+
+def get_centralsymmetry_point(p, center):
+    x, y = p
+    cx, cy = center
+    return 2 * cx - x, 2 * cy - y
