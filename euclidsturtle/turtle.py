@@ -3,7 +3,7 @@ import turtle
 
 from .geotool import (Line, Segment, float_tuple_equals,
                       get_axialsymmetry_angle, get_axialsymmetry_point,
-                      get_centralsymmetry_point)
+                      get_centralsymmetry_point, get_middividing_point)
 
 
 class Turtle(turtle.Turtle):
@@ -27,7 +27,7 @@ class Turtle(turtle.Turtle):
         screen.xscale = screen.yscale = scale
 
     def disappear(self):
-        self.reset()
+        self.clear()
         self.hideturtle()
 
     def length(self):
@@ -72,10 +72,9 @@ class Turtle(turtle.Turtle):
 
     def axial_symmetry(self, axis, color=None, line=False):
         axis_start = axis.position()
-        # axis.forward(100 / self._scale())
         axis.forward(100 / self._scale())
         axis_end = axis.position()
-        # axis.undo()
+        axis.undo()
         axis_line = Line(Segment(*axis_start, *axis_end))
         if not line:
             x, y = get_axialsymmetry_point(self.position(), axis_line)
@@ -120,8 +119,53 @@ class Turtle(turtle.Turtle):
                     point, center.position()))
             return t
 
-    def axis(self, v, color=None, line=False):
-        pass
+    def axis(self, v, color=None):
+        v_angle = v.heading()
+        v_start = v.position()
+        v.forward(100 / self._scale())
+        v_end = v.position()
+        v.undo()
+        v_line = Line(Segment(*v_start, *v_end))
+        self_angle = self.heading()
+        self_start = self.position()
+        self.forward(100 / self._scale())
+        self_end = self.position()
+        self.undo()
+        self_line = Line(Segment(*self_start, *self_end))
+        its_x, its_y = v_line.intersection_point(self_line)
+        if its_x is not None and -10000 < its_x < 10000 and -10000 < its_y < 10000:
+            p = (its_x, its_y)
+            is_intersected = True
+        else:
+            p = get_middividing_point(self.position(), v.position())
+            while True:
+                v_point = get_middividing_point(
+                    get_axialsymmetry_point(p, v_line), p)
+                self_point = get_middividing_point(
+                    get_axialsymmetry_point(p, self_line), p)
+                next_p = get_middividing_point(v_point, self_point)
+                if float_tuple_equals(p, next_p):
+                    break
+                p = next_p
+            is_intersected = False
+        t = Turtle()
+        if color is not None:
+            t.color(color)
+        t.teleport(p)
+        if abs(v_angle - self_angle) > 180:
+            axis_angle = ((v_angle + self_angle) / 2 + 180) % 360
+        else:
+            axis_angle = ((v_angle + self_angle) / 2) % 360
+        t.setheading(axis_angle)
+        if not is_intersected and abs(v_angle - self_angle) > 90:
+            t.disappear()
+            return t
+        front_line = Line(Segment(*self.position(), *v.position()))
+        t.forward(100 / self._scale())
+        t_line = Line(Segment(*p, *t.position()))
+        t.undo()
+        t.teleport(t_line.intersection_point(front_line))
+        return t
 
     def smart_forward(self):
         segments = []

@@ -1,7 +1,4 @@
-import pytest
-
-from euclidsturtle.geotool import (Line, Segment, float_tuple_equals,
-                                   get_axialsymmetry_point)
+from euclidsturtle.geotool import Line, Segment, get_axialsymmetry_point
 
 
 def test_get_axialsymmetry_point():

@@ -2,7 +2,7 @@ import math
 
 
 def float_equals(f1, f2):
-    return math.isclose(f1, f2, rel_tol=0.02)
+    return math.isclose(f1, f2, rel_tol=0.01) or abs(f1 - f2) < 0.02
 
 
 def float_tuple_equals(tp1, tp2):
@@ -79,6 +79,12 @@ class Line:
         x = (other.b * self.c - self.b * other.c) / determinant
         y = (self.a * other.c - other.a * self.c) / determinant
         return x, y
+
+
+def get_middividing_point(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return (x1 + x2) / 2, (y1 + y2) / 2
 
 
 def get_centralsymmetry_point(p, center):
