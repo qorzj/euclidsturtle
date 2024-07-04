@@ -213,7 +213,7 @@ class Turtle(turtle.Turtle):
         lb, ub = 0, 720.0  # lower bound and upper bound
         while ub - lb > 0.5:
             mid = (lb + ub) / 2
-            r.circle(radius, mid)
+            r.circle(radius, mid, max(int(mid / 20), 3))
             r_segments = Segment.get_segments(r.currentLine)
             if Segment.intersection_existed(segments, r_segments, ignore_point=self.position()):
                 ub = mid
@@ -248,3 +248,5 @@ class Turtle(turtle.Turtle):
 
 
 Pen = Turtle
+
+# color list: https://trinket.io/docs/colors

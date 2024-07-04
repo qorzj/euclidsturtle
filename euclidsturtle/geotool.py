@@ -36,6 +36,9 @@ class Segment:
         else:
             return None, None
 
+    def __repr__(self) -> str:
+        return 'Segment(%s, %s)' % (self.start, self.end)
+
     @staticmethod
     def get_segments(lines):
         segments = []
