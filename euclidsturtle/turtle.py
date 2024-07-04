@@ -41,7 +41,7 @@ class Turtle(turtle.Turtle):
     def teleport(self, x, y=None):
         speed = self.speed()
         self.speed(0)
-        self.goto(x, y)
+        self.setposition(x, y)
         self.clear()
         self.speed(speed)
 
@@ -49,28 +49,31 @@ class Turtle(turtle.Turtle):
         self.dot(5)
         self.hideturtle()
 
-    def go_towards(self, target, percent=100):
+    def goto(self, target, *, percent=100):
         if isinstance(target, tuple):
             target_pos = target
         else:
             target_pos = target.position()
-        self.setheading(self.towards(target_pos))
+        self.setheading(super().towards(target_pos))
         if percent == 100:
-            self.goto(target_pos)
+            self.setposition(target_pos)
         else:
             x1, y1 = self.position()
             x2, y2 = target_pos
             x, y = x1 + (x2 - x1) * percent / 100, y1 + \
                 (y2 - y1) * percent / 100
-            self.goto(x, y)
+            self.setposition(x, y)
 
-    def parallel(self, v, opposite=False):
+    def towards(self, target):
+        self.goto(target, percent=0)
+
+    def parallel(self, v, *, opposite=False):
         if opposite:
             self.setheading((v.heading() + 180) % 360)
         else:
             self.setheading(v.heading())
 
-    def axial_symmetry(self, axis, color=None, line=False):
+    def axial_symmetry(self, axis, *, color=None, line=False):
         axis_start = axis.position()
         axis.forward(100 / self._scale())
         axis_end = axis.position()
@@ -94,10 +97,10 @@ class Turtle(turtle.Turtle):
                 self.heading(), axis.heading()))
             t.teleport(get_axialsymmetry_point(points[0], axis_line))
             for point in points[1:]:
-                t.go_towards(get_axialsymmetry_point(point, axis_line))
+                t.goto(get_axialsymmetry_point(point, axis_line))
             return t
 
-    def central_symmetry(self, center, color=None, line=False):
+    def central_symmetry(self, center, *, color=None, line=False):
         if not line:
             x, y = get_centralsymmetry_point(
                 self.position(), center.position())
@@ -115,11 +118,10 @@ class Turtle(turtle.Turtle):
             t.left(180)
             t.teleport(get_centralsymmetry_point(points[0], center.position()))
             for point in points[1:]:
-                t.go_towards(get_centralsymmetry_point(
-                    point, center.position()))
+                t.goto(get_centralsymmetry_point(point, center.position()))
             return t
 
-    def axis(self, v, color=None):
+    def axis(self, v, *, color=None):
         v_angle = v.heading()
         v_start = v.position()
         v.forward(100 / self._scale())
