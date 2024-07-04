@@ -49,8 +49,10 @@ class Turtle(turtle.Turtle):
         self.dot(5)
         self.hideturtle()
 
-    def goto(self, target, *, percent=100):
-        if isinstance(target, tuple):
+    def goto(self, target, y=None, *, percent=100):
+        if y is not None:
+            target_pos = (target, y)
+        elif isinstance(target, tuple):
             target_pos = target
         else:
             target_pos = target.position()
@@ -64,8 +66,8 @@ class Turtle(turtle.Turtle):
                 (y2 - y1) * percent / 100
             self.setposition(x, y)
 
-    def towards(self, target):
-        self.goto(target, percent=0)
+    def towards(self, target, y=None):
+        self.goto(target, y, percent=0)
 
     def parallel(self, v, *, opposite=False):
         if opposite:
@@ -178,8 +180,7 @@ class Turtle(turtle.Turtle):
         r = self[-1]
         r.color('#CCCCCC')
         r.speed(0)
-        # lb, ub = 0, 10000.0  # lower bound and upper bound
-        lb, ub = 0, 500 / self._scale()  # lower bound and upper bound
+        lb, ub = 0, 1000 / self._scale()  # lower bound and upper bound
         while ub - lb > 0.01:
             mid = (lb + ub) / 2
             # print(f'lb={lb}, ub={ub}, mid={mid}')
