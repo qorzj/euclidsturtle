@@ -14,7 +14,7 @@ class Segment:
         self.start = (x1, y1)
         self.end = (x2, y2)
 
-    def intersection_point(self, other: 'Segment'):
+    def intersection_point(self, other):
         """
         get (x, y) of intersection point of two segments
         return (None, None) if not intersected
@@ -71,7 +71,7 @@ class Line:
         self.b = x1 - x2
         self.c = x1 * y2 - x2 * y1
 
-    def intersection_point(self, other: 'Line'):
+    def intersection_point(self, other):
         """
         get (x, y) of intersection point of two lines
         return (None, None) if not intersected
@@ -96,7 +96,7 @@ def get_centralsymmetry_point(p, center):
     return 2 * cx - x, 2 * cy - y
 
 
-def get_axialsymmetry_point(p, axis: Line):
+def get_axialsymmetry_point(p, axis):
     x1, y1 = p
     a, b, c = axis.a, axis.b, axis.c
     return ((b*b-a*a)*x1-2*a*b*y1+2*a*c)/(a*a+b*b), ((a*a-b*b)*y1-2*a*b*x1+2*b*c)/(a*a+b*b)

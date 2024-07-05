@@ -7,20 +7,16 @@ from .geotool import (Line, Segment, float_tuple_equals,
 
 
 class Turtle(turtle.Turtle):
-    def __getitem__(self, index):
-        t = Turtle()
-        if isinstance(index, slice):
-            points = self.currentLine[index]
-            self.teleport(points[0])
-            for point in points[1:]:
-                self.go_towards(point)
-        else:
-            t.setheading(self.heading())
-            t.teleport(self.currentLine[index])
-        return t
-
     def __len__(self):
         return len(self.currentLine)
+
+    def clone(self, color=None, *, index=-1):
+        t = Turtle()
+        if color is not None:
+            t.color(color)
+        t.setheading(self.heading())
+        t.teleport(self.currentLine[index])
+        return t
 
     def setscale(self, scale=1.0):
         screen = self.getscreen()
@@ -83,18 +79,14 @@ class Turtle(turtle.Turtle):
         axis_line = Line(Segment(*axis_start, *axis_end))
         if not line:
             x, y = get_axialsymmetry_point(self.position(), axis_line)
-            t = self[-1]
-            if color is not None:
-                t.color(color)
+            t = self.clone(color)
             t.teleport(x, y)
             t.setheading(get_axialsymmetry_angle(
                 self.heading(), axis.heading()))
             return t
         else:
             points = self.currentLine
-            t = self[0]
-            if color is not None:
-                t.color(color)
+            t = self.clone(color, index=0)
             t.setheading(get_axialsymmetry_angle(
                 self.heading(), axis.heading()))
             t.teleport(get_axialsymmetry_point(points[0], axis_line))
@@ -106,17 +98,13 @@ class Turtle(turtle.Turtle):
         if not line:
             x, y = get_centralsymmetry_point(
                 self.position(), center.position())
-            t = self[-1]
-            if color is not None:
-                t.color(color)
+            t = self.clone(color)
             t.teleport(x, y)
             t.left(180)
             return t
         else:
             points = self.currentLine
-            t = self[0]
-            if color is not None:
-                t.color(color)
+            t = self.clone(color, index=0)
             t.left(180)
             t.teleport(get_centralsymmetry_point(points[0], center.position()))
             for point in points[1:]:
@@ -177,8 +165,7 @@ class Turtle(turtle.Turtle):
         for t in turtle.turtles():
             if t.isvisible():
                 segments.extend(Segment.get_segments(t.currentLine))
-        r = self[-1]
-        r.color('#CCCCCC')
+        r = self.clone('#CCCCCC')
         r.speed(0)
         lb, ub = 0, 1000 / self._scale()  # lower bound and upper bound
         while ub - lb > 0.01:
@@ -207,8 +194,7 @@ class Turtle(turtle.Turtle):
         for t in turtle.turtles():
             if t.isvisible():
                 segments.extend(Segment.get_segments(t.currentLine))
-        r = self[-1]
-        r.color('#CCCCCC')
+        r = self.clone('#CCCCCC')
         r.speed(0)
         lb, ub = 0, 720.0  # lower bound and upper bound
         while ub - lb > 0.5:
